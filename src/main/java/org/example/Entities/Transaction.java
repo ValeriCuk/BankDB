@@ -30,4 +30,14 @@ public class Transaction {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date", nullable = false)
     private Date date;
+
+    public Transaction() {
+    }
+
+    public Transaction(Account account, DtCt dtCt, BigDecimal amount, Date date) {
+        this.account = account;
+        this.dtCt = dtCt;
+        this.amount = amount;
+        this.date = date;
+    }
 }

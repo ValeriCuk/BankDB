@@ -1,7 +1,7 @@
 package org.example.Entities;
 
 import lombok.Data;
-import org.example.Currency;
+import org.example.CurrencyBank;
 
 import javax.persistence.*;
 
@@ -18,7 +18,7 @@ public class Account {
     private int number;
 
     @Column(name = "cur", nullable = false)
-    private Currency currency;
+    private CurrencyBank currencyBank;
 
     @Column(name = "balance", nullable = false)
     private double balance;
@@ -26,5 +26,14 @@ public class Account {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public Account() {}
+
+    public Account(int number, CurrencyBank currencyBank, double balance, User user) {
+        this.number = number;
+        this.currencyBank = currencyBank;
+        this.balance = balance;
+        this.user = user;
+    }
 
 }

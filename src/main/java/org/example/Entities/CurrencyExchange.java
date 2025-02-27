@@ -1,10 +1,10 @@
 package org.example.Entities;
 
 import lombok.Data;
+import org.example.CurrencyBank;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Entity
 @Data
@@ -15,11 +15,19 @@ public class CurrencyExchange {
     private int id;
 
     @Column(name = "currency", nullable = false)
-    private String currency;
+    private CurrencyBank currency;
 
     @Column(name = "buy_rate", nullable = false)
-    private BigDecimal buyRate;
+    private double buyRate;
 
     @Column(name = "sell_rate", nullable = false)
-    private BigDecimal sellRate;
+    private double sellRate;
+
+    public CurrencyExchange() {}
+
+    public CurrencyExchange(CurrencyBank currency, double buyRate, double sellRate) {
+        this.currency = currency;
+        this.buyRate = buyRate;
+        this.sellRate = sellRate;
+    }
 }
