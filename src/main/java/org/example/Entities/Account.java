@@ -14,10 +14,10 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "№", nullable = false, unique = true)
+    @Column(name = "num", nullable = false, unique = true)
     private int number;
 
-    @Column(name = "cur", nullable = false)
+    @Column(name = "curr", nullable = false)
     private CurrencyBank currencyBank;
 
     @Column(name = "balance", nullable = false)

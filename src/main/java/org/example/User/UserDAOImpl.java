@@ -42,8 +42,14 @@ public class UserDAOImpl implements UserDAO {
             List<User> users = em.createQuery(cq).getResultList();
             printList(users);
         }catch (Exception e){
-            throw new RuntimeException(e);
+            System.out.println("Error while fetching users");
+            throw e;
         }
+    }
+
+    @Override
+    public User getUser(int id) {
+        return em.find(User.class, id);
     }
 
     private void printList(List<User> list){

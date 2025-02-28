@@ -14,4 +14,8 @@ public class UserService {
         userDAO.addUser(new User("user_first"));
         userDAO.addUser(new User("user_second"));
     }
+
+    public void showUsers(){
+        userDAO.showUsers();
+    }
 }
