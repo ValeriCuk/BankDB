@@ -31,23 +31,16 @@ public class CurrencyExchangeDAOImpl implements CurrencyExchangeDAO {
     }
 
     @Override
-    public void showCourses() {
+    public List<CurrencyExchange> showCourses() {
         try{
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<CurrencyExchange> cq = cb.createQuery(CurrencyExchange.class);
             Root<CurrencyExchange> root = cq.from(CurrencyExchange.class);
 
             cq.select(root);
-            List<CurrencyExchange> currencyExchange = em.createQuery(cq).getResultList();
-            printList(currencyExchange);
+            return em.createQuery(cq).getResultList();
         }catch (Exception e){
             throw new RuntimeException(e);
-        }
-    }
-
-    private void printList(List<CurrencyExchange> list){
-        for (CurrencyExchange item : list) {
-            System.out.println(item);
         }
     }
 }

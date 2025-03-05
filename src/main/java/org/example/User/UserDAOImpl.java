@@ -32,15 +32,14 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public void showUsers() {
+    public List<User> getAllUsers() {
         try{
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<User> cq = cb.createQuery(User.class);
             Root<User> root = cq.from(User.class);
 
             cq.select(root);
-            List<User> users = em.createQuery(cq).getResultList();
-            printList(users);
+            return em.createQuery(cq).getResultList();
         }catch (Exception e){
             System.out.println("Error while fetching users");
             throw e;
@@ -48,13 +47,7 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public User getUser(int id) {
+    public User getUserBy(int id) {
         return em.find(User.class, id);
-    }
-
-    private void printList(List<User> list){
-        for (User item : list) {
-           System.out.println(item);
-        }
     }
 }

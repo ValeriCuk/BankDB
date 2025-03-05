@@ -36,4 +36,9 @@ public class Account {
         this.user = user;
     }
 
+    @Override
+    public String toString() {
+        return String.format("ID: %d, Number: %s, Account currency: %s, Balance: %.2f, User: %s",
+                getId(), getNumber(), getCurrencyBank(), getBalance(), getUser());
+    }
 }

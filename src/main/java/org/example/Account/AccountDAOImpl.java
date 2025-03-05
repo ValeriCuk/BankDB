@@ -53,7 +53,7 @@ public class AccountDAOImpl implements AccountDAO {
             CriteriaQuery<Long> cq = cb.createQuery(Long.class);
             Root<Account> root = cq.from(Account.class);
 
-            cq.select(cb.count(root)).where(cb.equal(root.get("num"), account.getNumber()));
+            cq.select(cb.count(root)).where(cb.equal(root.get("number"), account.getNumber()));
             Long count = em.createQuery(cq).getSingleResult();
             return count > 0;
         } catch (Exception e) {
@@ -62,24 +62,35 @@ public class AccountDAOImpl implements AccountDAO {
     }
 
     @Override
-    public void showAccounts() {
+    public List<Account> getAllAccounts() {
         try{
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<Account> cq = cb.createQuery(Account.class);
             Root<Account> root = cq.from(Account.class);
 
             cq.select(root);
-            List<Account> accounts = em.createQuery(cq).getResultList();
-            printList(accounts);
+            return em.createQuery(cq).getResultList();
         }catch (Exception e){
             System.out.println("Error while fetching users");
             throw e;
         }
     }
 
-    private void printList(List<Account> list){
-        for (Account item : list) {
-            System.out.println(item);
+    @Override
+    public List<Account> getAccountsWith(User user) {
+        try {
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Account> cq = cb.createQuery(Account.class);
+            Root<Account> root = cq.from(Account.class);
+
+            cq.select(root).where(cb.equal(root.get("user"), user));
+
+            return em.createQuery(cq).getResultList();
+
+        } catch (Exception e) {
+            System.err.println("Error while receiving invoices: " + e.getMessage());
+            throw e;
         }
     }
+
 }

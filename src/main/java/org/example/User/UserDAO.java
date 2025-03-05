@@ -2,8 +2,10 @@ package org.example.User;
 
 import org.example.Entities.User;
 
+import java.util.List;
+
 public interface UserDAO {
     void addUser(User user);
-    void showUsers();
-    User getUser(int id);
+    List<User> getAllUsers();
+    User getUserBy(int id);
 }

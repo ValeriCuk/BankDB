@@ -3,6 +3,8 @@ package org.example.CurrencyExchange;
 import org.example.CurrencyBank;
 import org.example.Entities.CurrencyExchange;
 
+import java.util.List;
+
 public class CurrencyExchangeService {
 
     private final CurrencyExchangeDAO currencyExchangeDAO;
@@ -18,7 +20,12 @@ public class CurrencyExchangeService {
     }
 
     public void showCourses(){
-        currencyExchangeDAO.showCourses();
+        printList(currencyExchangeDAO.showCourses());
     }
 
+    private void printList(List<CurrencyExchange> list){
+        for (CurrencyExchange item : list) {
+            System.out.println(item);
+        }
+    }
 }
