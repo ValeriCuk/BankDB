@@ -2,6 +2,7 @@ package org.example.Account;
 
 import org.example.BankUtil;
 import org.example.CurrencyBank;
+import org.example.CurrencyExchange.CurrencyExchangeService;
 import org.example.DtCt;
 import org.example.Entities.Account;
 import org.example.Entities.Transaction;
@@ -25,12 +26,14 @@ public class AccountService {
     private final UserDAO userDAO;
     private final Scanner scanner = new Scanner(System.in);
     private final EntityManager em;
+    private final CurrencyExchangeService currencyExchangeService;
 
     public AccountService() {
         this.em = BankUtil.getEntityManager();
         this.accountDAO = new AccountDAOImpl(em);
         this.transactionDAO = new TransactionDAOImpl(em);
         this.userDAO = new UserDAOImpl(em);
+        this.currencyExchangeService = new CurrencyExchangeService();
     }
 
     public void addAccount(Account account){
@@ -94,7 +97,6 @@ public class AccountService {
         }catch (Exception e){
             transaction.rollback();
             System.out.println("Deposit failed");
-            e.printStackTrace();
         }
     }
 
@@ -127,8 +129,38 @@ public class AccountService {
         }
     }
 
+    public void internalTransfer(double amount, Account fromAccount, Account toAccount){
+        EntityTransaction transaction = em.getTransaction();
+
+        try{
+            transaction.begin();
+            if (fromAccount.getBalance() < amount) {
+                transaction.rollback();
+                System.out.println("Insufficient funds in the sender's account");
+            }
+            fromAccount.setBalance(fromAccount.getBalance() - amount);
+            Transaction transaction1 = new Transaction(fromAccount, DtCt.CREDIT, amount, new Date());
+            transactionDAO.addTransaction(transaction1);
+            updateAccount(fromAccount);
+
+            double amountFromUAH = amount * currencyExchangeService.getBuyingPrice(fromAccount.getCurrencyBank());
+            double amountTo = amountFromUAH / currencyExchangeService.getSellingPrice(toAccount.getCurrencyBank());
+            toAccount.setBalance(toAccount.getBalance() + amountTo);
+            Transaction transaction2 = new Transaction(toAccount, DtCt.DEBIT, amountTo, new Date());
+            transactionDAO.addTransaction(transaction2);
+            updateAccount(toAccount);
+            transaction.commit();
+            System.out.println("Transfer successful");
+        }catch (Exception e){
+            if(transaction.isActive()) {
+                transaction.rollback();
+                System.out.println("Transfer failed");
+            }
+        }
+    }
+
     public void showBalance(){
-        System.out.println(accountDAO.getAllAccounts());
+        printList(accountDAO.getAllAccounts());
         System.out.println("Enter account ID");
         int id = getIntInput();
         if (id < 0) return;
@@ -138,6 +170,16 @@ public class AccountService {
             showBalance();
         }
         System.out.println("Balance: " + getBalance(account));
+    }
+
+    public void showGeneralBalance(User user){
+        List<Account> userAccounts = accountDAO.getAccountsWith(user);
+        double genBalance = 0.0;
+        for (Account account : userAccounts) {
+            double balanceUAH = getBalance(account) * currencyExchangeService.getBuyingPrice(account.getCurrencyBank());
+            genBalance += balanceUAH;
+        }
+        System.out.println("General balance of " + user.toString() + "\n-> " + genBalance);
     }
 
     public void addAccounts() {

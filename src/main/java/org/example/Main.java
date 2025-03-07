@@ -33,13 +33,13 @@ public class Main {
                         bankService.transfer();
                         break;
                     case "3":
-//                        TODO: internalTransfer;
+                        bankService.internalTransfer();
                         break;
                     case "4":
                         bankService.showAccountBalance();
                         break;
                     case "5":
-//                        TODO: showGeneralBalance;
+                        bankService.showUserGeneralBalance();
                         break;
                     case "6":
                         bankService.getUserService().printAllUsers();

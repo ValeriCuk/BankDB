@@ -52,12 +52,35 @@ public class BankService {
         accountService.transfer(amount, from, to);
     }
 
+    public void internalTransfer(){
+        User user = userService.selectUser();
+        if (user == null) {
+            System.out.println("The user with the entered id does not exist.");
+            return;
+        }
+        System.out.println("\n\bFROM:\n");
+        Account fromAccount = accountService.selectAccount(user);
+        if (fromAccount == null) internalTransfer();
+
+        double amount = getAmount();
+
+        System.out.println("\n\bTO:\n");
+        Account toAccount = accountService.selectAccount(user);
+        if (toAccount == null) internalTransfer();
+        accountService.internalTransfer(amount, fromAccount, toAccount);
+    }
+
     public void showAccountBalance() {
         accountService.showBalance();
     }
 
     public void showUserGeneralBalance(){
-        //TODO: general balance with currency exchange
+        User user = userService.selectUser();
+        if (user == null) {
+            System.out.println("The user with the entered id does not exist.");
+            return;
+        }
+        accountService.showGeneralBalance(user);
     }
 
     private double getAmount() {

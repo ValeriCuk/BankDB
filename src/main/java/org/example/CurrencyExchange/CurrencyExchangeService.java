@@ -36,10 +36,22 @@ public class CurrencyExchangeService {
         return currencyExchangeDAO.getAllCourses();
     }
 
+    public double getSellingPrice(CurrencyBank currencyBank){
+        CurrencyExchange currencyExchange = currencyExchangeDAO.getCurrencyExchangeWith(currencyBank);
+        if(currencyExchange == null) return -1;
+        return currencyExchange.getSellRate();
+    }
+
+    public double getBuyingPrice(CurrencyBank currencyBank){
+        CurrencyExchange currencyExchange = currencyExchangeDAO.getCurrencyExchangeWith(currencyBank);
+        if(currencyExchange == null) return -1;
+        return currencyExchange.getBuyRate();
+    }
+
     public void addCourses(){
-        currencyExchangeDAO.addCourse(new CurrencyExchange(CurrencyBank.USD, 41.40, 41.90));
-        currencyExchangeDAO.addCourse(new CurrencyExchange(CurrencyBank.EUR, 43.42, 43.95));
-        currencyExchangeDAO.addCourse(new CurrencyExchange(CurrencyBank.UAH, 1.00, 1.00));
+        addCourse(new CurrencyExchange(CurrencyBank.USD, 41.40, 41.90));
+        addCourse(new CurrencyExchange(CurrencyBank.EUR, 43.42, 43.95));
+        addCourse(new CurrencyExchange(CurrencyBank.UAH, 1.00, 1.00));
     }
 
     public void printAllCourses(){
