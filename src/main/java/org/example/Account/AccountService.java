@@ -55,7 +55,6 @@ public class AccountService {
             System.out.println("Account added");
         }catch (Exception e){
             transaction.rollback();
-            e.printStackTrace();
         }
     }
 
@@ -100,7 +99,45 @@ public class AccountService {
     }
 
     public void transfer(double amount, Account fromAccount, Account toAccount){
+        EntityTransaction transaction = em.getTransaction();
 
+        try{
+            transaction.begin();
+            if (fromAccount.getBalance() < amount) {
+                transaction.rollback();
+                System.out.println("Insufficient funds in the sender's account");
+            }
+            fromAccount.setBalance(fromAccount.getBalance() - amount);
+            Transaction transaction1 = new Transaction(fromAccount, DtCt.CREDIT, amount, new Date());
+            transactionDAO.addTransaction(transaction1);
+            updateAccount(fromAccount);
+
+            toAccount.setBalance(toAccount.getBalance() + amount);
+            Transaction transaction2 = new Transaction(toAccount, DtCt.DEBIT, amount, new Date());
+            transactionDAO.addTransaction(transaction2);
+            updateAccount(toAccount);
+
+            transaction.commit();
+            System.out.println("Transfer successful");
+        }catch (Exception e){
+            if(transaction.isActive()) {
+                transaction.rollback();
+                System.out.println("Transfer failed");
+            }
+        }
+    }
+
+    public void showBalance(){
+        System.out.println(accountDAO.getAllAccounts());
+        System.out.println("Enter account ID");
+        int id = getIntInput();
+        if (id < 0) return;
+        Account account = accountDAO.getAccountBy(id);
+        if (account == null) {
+            System.out.println("Account does not exist");
+            showBalance();
+        }
+        System.out.println("Balance: " + getBalance(account));
     }
 
     public void addAccounts() {
@@ -142,6 +179,30 @@ public class AccountService {
         Account account = findAccountById(userAccounts, accountId);
         if (account == null) System.out.println("No such account");
         return account;
+    }
+
+    public Account getAccountFromWhich() {
+        printAllAccounts();
+        System.out.println("Enter the account id from which the transfer will be made:");
+        int accountIdFrom = getIntInput();
+        return getAccountBy(accountIdFrom);
+    }
+
+    public Account getAccountWithSame(CurrencyBank currencyBank) {
+        printAccountWith(currencyBank);
+        System.out.println("Enter the account id from the list above to which the transfer will be made:");
+        int accountIdTo = getIntInput();
+        Account to = findAccountById(getAccountsWith(currencyBank), accountIdTo);
+        if (to == null) return null;
+        return to;
+    }
+
+    private List<Account> getAccountsWith(CurrencyBank currencyBank) {
+        return accountDAO.getAccountsWith(currencyBank);
+    }
+
+    private void printAccountWith(CurrencyBank currencyBank) {
+        printList(getAccountsWith(currencyBank));
     }
 
     private int getIntInput() {

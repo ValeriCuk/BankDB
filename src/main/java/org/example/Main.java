@@ -36,7 +36,7 @@ public class Main {
 //                        TODO: internalTransfer;
                         break;
                     case "4":
-//                        TODO: showBalance;
+                        bankService.showAccountBalance();
                         break;
                     case "5":
 //                        TODO: showGeneralBalance;

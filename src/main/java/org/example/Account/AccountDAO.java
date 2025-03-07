@@ -1,5 +1,6 @@
 package org.example.Account;
 
+import org.example.CurrencyBank;
 import org.example.Entities.Account;
 import org.example.Entities.User;
 
@@ -13,4 +14,5 @@ public interface AccountDAO {
     List<Account> getAccountsWith(User user);
     Account getAccountBy(int id);
     double getBalance(Account account);
+    List<Account> getAccountsWith(CurrencyBank currencyBank);
 }

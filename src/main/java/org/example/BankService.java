@@ -22,9 +22,10 @@ public class BankService {
     private final TransactionService transactionService = new TransactionService();
     private final Scanner scanner = new Scanner(System.in);
 
-    public BankService() {}
+    public BankService() {
+    }
 
-    public void deposit(){
+    public void deposit() {
         User user = userService.selectUser();
         if (user == null) {
             System.out.println("The user with the entered id does not exist.");
@@ -38,28 +39,31 @@ public class BankService {
         System.out.println("New balance: " + accountService.getBalance(currentAccount));
     }
 
-    public  void transfer(){
-        accountService.printAllAccounts();
-        System.out.println("Enter the account id from which the transfer will be made:");
-        int accountIdFrom = getIntInput();
-        Account from = accountService.getAccountBy(accountIdFrom);
+    public void transfer() {
+        Account from = accountService.getAccountFromWhich();
         if (from == null) return;
-        System.out.println("Enter the account id from the list above to which the transfer will be made:");
-        int accountIdTo = getIntInput();
-        Account to = accountService.getAccountBy(accountIdTo);
+
+        Account to = accountService.getAccountWithSame(from.getCurrencyBank());
         if (to == null) return;
-        System.out.println("Enter the transfer amount:");
+
         double amount = getAmount();
         if (amount < 0) transfer();
+
         accountService.transfer(amount, from, to);
-        System.out.println("New balance from: " + accountService.getBalance(from));
-        System.out.println("New balance to: " + accountService.getBalance(to));
+    }
+
+    public void showAccountBalance() {
+        accountService.showBalance();
+    }
+
+    public void showUserGeneralBalance(){
+        //TODO: general balance with currency exchange
     }
 
     private double getAmount() {
         double amount;
         while (true) {
-            System.out.println("Enter the top-up amount");
+            System.out.println("Enter the amount");
             String input = scanner.nextLine();
             if (input == null || input.trim().isEmpty()) {
                 System.out.println("-> back\n");
@@ -71,23 +75,6 @@ public class BankService {
                 return amount;
             } catch (NumberFormatException e) {
                 System.out.println("-> Invalid input! " + strPrice + "\n");
-            }
-        }
-    }
-
-
-    private int getIntInput() {
-        while (true) {
-            System.out.print("-> ");
-            String input = scanner.nextLine().trim();
-
-            if (input.isEmpty()) {
-                return -1;
-            }
-            try {
-                return Integer.parseInt(input);
-            } catch (NumberFormatException e) {
-                System.out.println("-> Invalid input! '" + input + "' is not a valid integer. Try again\n");
             }
         }
     }

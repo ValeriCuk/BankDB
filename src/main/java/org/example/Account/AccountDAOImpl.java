@@ -1,5 +1,6 @@
 package org.example.Account;
 
+import org.example.CurrencyBank;
 import org.example.Entities.Account;
 import org.example.Entities.User;
 import javax.persistence.EntityManager;
@@ -67,6 +68,23 @@ public class AccountDAOImpl implements AccountDAO {
             Root<Account> root = cq.from(Account.class);
 
             cq.select(root).where(cb.equal(root.get("user"), user));
+
+            return em.createQuery(cq).getResultList();
+
+        } catch (Exception e) {
+            System.err.println("Error while receiving invoices: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public List<Account> getAccountsWith(CurrencyBank currencyBank){
+        try {
+            CriteriaBuilder cb = em.getCriteriaBuilder();
+            CriteriaQuery<Account> cq = cb.createQuery(Account.class);
+            Root<Account> root = cq.from(Account.class);
+
+            cq.select(root).where(cb.equal(root.get("currencyBank"), currencyBank));
 
             return em.createQuery(cq).getResultList();
 
