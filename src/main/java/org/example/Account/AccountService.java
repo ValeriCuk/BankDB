@@ -1,11 +1,19 @@
 package org.example.Account;
 
+import org.example.BankUtil;
 import org.example.CurrencyBank;
+import org.example.DtCt;
 import org.example.Entities.Account;
+import org.example.Entities.Transaction;
 import org.example.Entities.User;
+import org.example.Transaction.TransactionDAO;
+import org.example.Transaction.TransactionDAOImpl;
 import org.example.User.UserDAO;
 import org.example.User.UserDAOImpl;
+import java.util.Date;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -13,12 +21,86 @@ import java.util.Scanner;
 public class AccountService {
 
     private final AccountDAO accountDAO;
+    private final TransactionDAO transactionDAO;
     private final UserDAO userDAO;
     private final Scanner scanner = new Scanner(System.in);
+    private final EntityManager em;
 
     public AccountService() {
-        this.accountDAO = new AccountDAOImpl();
-        this.userDAO = new UserDAOImpl();
+        this.em = BankUtil.getEntityManager();
+        this.accountDAO = new AccountDAOImpl(em);
+        this.transactionDAO = new TransactionDAOImpl(em);
+        this.userDAO = new UserDAOImpl(em);
+    }
+
+    public void addAccount(Account account){
+        EntityTransaction transaction = em.getTransaction();
+
+        try{
+            transaction.begin();
+
+            int userId = account.getUser().getId();
+            if (userDAO.getUserBy(userId) == null) {
+                userDAO.addUser(account.getUser());
+            }
+
+            if (accountDAO.isExist(account)) {
+                System.out.println("Account already exists");
+                transaction.rollback();
+                return;
+            }
+
+            accountDAO.addAccount(account);
+            transaction.commit();
+            System.out.println("Account added");
+        }catch (Exception e){
+            transaction.rollback();
+            e.printStackTrace();
+        }
+    }
+
+    public void updateAccount(Account account) {
+        accountDAO.updateAccount(account);
+    }
+
+    public void printAllAccounts(){
+        printList(accountDAO.getAllAccounts());
+    }
+
+    public List<Account> getAccountsWith(User user){
+        return accountDAO.getAccountsWith(user);
+    }
+
+    public Account getAccountBy(int id) {
+        if (accountDAO.getAccountBy(id) == null) System.out.println("Account does not exist");
+        return accountDAO.getAccountBy(id);
+    }
+
+    public double getBalance(Account account) {
+        return accountDAO.getBalance(account);
+    }
+
+    public void deposit(double amount, Account account) {
+        EntityTransaction transaction = em.getTransaction();
+
+        try{
+            transaction.begin();
+            account.setBalance(account.getBalance() + amount);
+            updateAccount(account);
+
+            Transaction transaction1 = new Transaction(account, DtCt.DEBIT, amount, new Date());
+            transactionDAO.addTransaction(transaction1);
+            System.out.println("Deposit successful");
+            transaction.commit();
+        }catch (Exception e){
+            transaction.rollback();
+            System.out.println("Deposit failed");
+            e.printStackTrace();
+        }
+    }
+
+    public void transfer(double amount, Account fromAccount, Account toAccount){
+
     }
 
     public void addAccounts() {
@@ -26,27 +108,22 @@ public class AccountService {
         Account account1UAH = new Account(123, CurrencyBank.UAH, 0.0, userFirst);
         Account account1USD = new Account(456, CurrencyBank.USD, 0.0, userFirst);
         Account account1EUR = new Account(789, CurrencyBank.EUR, 0.0, userFirst);
-        accountDAO.addAccount(account1UAH);
-        accountDAO.addAccount(account1USD);
-        accountDAO.addAccount(account1EUR);
+        addAccount(account1UAH);
+        addAccount(account1USD);
+        addAccount(account1EUR);
 
 
         User userSecond = userDAO.getUserBy(2) == null ? new User("custom_name2") : userDAO.getUserBy(2);
         Account account2UAH = new Account(123321, CurrencyBank.UAH, 0.0, userSecond);
         Account account2USD = new Account(456654, CurrencyBank.USD, 0.0, userSecond);
         Account account2EUR = new Account(789987, CurrencyBank.EUR, 0.0, userSecond);
-        accountDAO.addAccount(account2UAH);
-        accountDAO.addAccount(account2USD);
-        accountDAO.addAccount(account2EUR);
-    }
-
-
-    public void showAccounts(){
-        printList(accountDAO.getAllAccounts());
+        addAccount(account2UAH);
+        addAccount(account2USD);
+        addAccount(account2EUR);
     }
 
     public Account selectAccount(User user) {
-        List<Account> userAccounts = accountDAO.getAccountsWith(user);
+        List<Account> userAccounts = getAccountsWith(user);
 
         if (userAccounts.isEmpty()) {
             System.out.println("The user has no accounts.");
@@ -91,13 +168,9 @@ public class AccountService {
         return account.orElse(null);
     }
 
-    private void printList(List<Account> list){
-        for (Account item : list) {
+    private <T> void printList(List<T> list){
+        for (T item : list) {
             System.out.println(item);
         }
-    }
-
-    public void deposit(double amount, Account account) {
-
     }
 }

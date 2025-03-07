@@ -1,13 +1,8 @@
 package org.example.Account;
 
-import org.example.BankUtil;
 import org.example.Entities.Account;
 import org.example.Entities.User;
-import org.example.User.UserDAO;
-import org.example.User.UserDAOImpl;
-
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -16,38 +11,26 @@ import java.util.List;
 public class AccountDAOImpl implements AccountDAO {
 
     private final EntityManager em;
-    private final UserDAO userDAO = new UserDAOImpl();
 
-    public AccountDAOImpl() {
-        em = BankUtil.getEntityManager();
+    public AccountDAOImpl(EntityManager em) {
+        this.em = em;
     }
 
 
     @Override
     public void addAccount(Account account) {
-        int userId = account.getUser().getId();
-        if (em.find(User.class, userId) == null) {
-            userDAO.addUser(account.getUser());
-        }
-
-        if (isExist(account)) {
-            System.out.println("Account already exists");
-            return;
-        }
-
-        EntityTransaction tx = em.getTransaction();
-
-        try{
-            tx.begin();
-            em.persist(account);
-            tx.commit();
-        }catch (Exception e){
-            tx.rollback();
-            throw e;
-        }
+        em.persist(account);
     }
 
-    private boolean isExist(Account account) {
+    @Override
+    public void updateAccount(Account account) {
+        Account oldAccount = getAccountBy(account.getId());
+        oldAccount.setBalance(account.getBalance());
+        em.merge(oldAccount);
+    }
+
+    @Override
+    public boolean isExist(Account account) {
         try{
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<Long> cq = cb.createQuery(Long.class);
@@ -93,4 +76,13 @@ public class AccountDAOImpl implements AccountDAO {
         }
     }
 
+    @Override
+    public Account getAccountBy(int id){
+        return em.find(Account.class, id);
+    }
+
+    @Override
+    public double getBalance(Account account) {
+        return getAccountBy(account.getId()).getBalance();
+    }
 }

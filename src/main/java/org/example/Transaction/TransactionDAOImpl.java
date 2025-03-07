@@ -15,22 +15,14 @@ public class TransactionDAOImpl implements TransactionDAO {
 
     private final EntityManager em;
 
-    public TransactionDAOImpl() {
-        this.em = BankUtil.getEntityManager();
+    public TransactionDAOImpl(EntityManager em) {
+        this.em = em;
     }
 
 
     @Override
     public void addTransaction(Transaction transaction) {
-        EntityTransaction emTransaction = em.getTransaction();
-        try {
-            emTransaction.begin();
-            em.persist(transaction);
-            emTransaction.commit();
-        }catch (Exception e){
-            emTransaction.rollback();
-            throw e;
-        }
+        em.persist(transaction);
     }
 
     @Override

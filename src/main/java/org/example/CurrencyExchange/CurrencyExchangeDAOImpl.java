@@ -13,25 +13,17 @@ public class CurrencyExchangeDAOImpl implements CurrencyExchangeDAO {
 
     private final EntityManager em;
 
-    public CurrencyExchangeDAOImpl() {
-        this.em = BankUtil.getEntityManager();
+    public CurrencyExchangeDAOImpl(EntityManager em) {
+        this.em = em;
     }
 
     @Override
     public void addCourse(CurrencyExchange currencyExchange) {
-        EntityTransaction tx = em.getTransaction();
-        try{
-            tx.begin();
-            em.persist(currencyExchange);
-            tx.commit();
-        }catch (Exception e){
-            tx.rollback();
-            throw e;
-        }
+        em.persist(currencyExchange);
     }
 
     @Override
-    public List<CurrencyExchange> showCourses() {
+    public List<CurrencyExchange> getAllCourses() {
         try{
             CriteriaBuilder cb = em.getCriteriaBuilder();
             CriteriaQuery<CurrencyExchange> cq = cb.createQuery(CurrencyExchange.class);

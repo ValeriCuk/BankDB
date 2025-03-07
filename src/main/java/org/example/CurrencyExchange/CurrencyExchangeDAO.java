@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface CurrencyExchangeDAO {
     void addCourse(CurrencyExchange currencyExchange);
-    List<CurrencyExchange> showCourses();
+    List<CurrencyExchange> getAllCourses();
 }

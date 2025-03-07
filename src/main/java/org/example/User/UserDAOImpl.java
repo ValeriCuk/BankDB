@@ -4,7 +4,6 @@ import org.example.BankUtil;
 import org.example.Entities.User;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -14,21 +13,14 @@ public class UserDAOImpl implements UserDAO {
 
     private final EntityManager em;
 
-    public UserDAOImpl() {
-        this.em = BankUtil.getEntityManager();
+    public UserDAOImpl(EntityManager em) {
+        this.em = em;
     }
 
     @Override
     public void addUser(User user) {
-        EntityTransaction tx = em.getTransaction();
-        try{
-            tx.begin();
-            em.persist(user);
-            tx.commit();
-        }catch (Exception e){
-            tx.rollback();
-            throw e;
-        }
+        em.persist(user);
+        System.out.println("User persisted: " + user.getUsername());
     }
 
     @Override
@@ -48,6 +40,7 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public User getUserBy(int id) {
+        System.out.println("getUserBy -> "+ id + " " + em.find(User.class, id));
         return em.find(User.class, id);
     }
 }

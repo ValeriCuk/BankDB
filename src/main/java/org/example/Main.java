@@ -13,10 +13,15 @@ public class Main {
         try {
             while (true) {
                 System.out.println("1: user account funding");
-                System.out.println("2: ...");
-                System.out.println("3: ...");
-                System.out.println("4: ...");
-                System.out.println("5: ...");
+                System.out.println("2: transfer");
+                System.out.println("3: internalTransfer");
+                System.out.println("4: showBalance");
+                System.out.println("5: showGeneralBalance");
+                System.out.println("6: all users");
+                System.out.println("7: all accounts");
+                System.out.println("8: all transactions");
+                System.out.println("9: all currency exchange");
+
                 System.out.print("-> ");
 
                 String s = sc.nextLine();
@@ -25,16 +30,28 @@ public class Main {
                         bankService.deposit();
                         break;
                     case "2":
-//                        ms.showMenu();
+                        bankService.transfer();
                         break;
                     case "3":
-//                        ms.showWithPriceRange();
+//                        TODO: internalTransfer;
                         break;
                     case "4":
-//                        ms.showWithDiscount();
+//                        TODO: showBalance;
                         break;
                     case "5":
-//                        ms.placeOrder();
+//                        TODO: showGeneralBalance;
+                        break;
+                    case "6":
+                        bankService.getUserService().printAllUsers();
+                        break;
+                    case "7":
+                        bankService.getAccountService().printAllAccounts();
+                        break;
+                    case "8":
+                        bankService.getTransactionService().printAllTransactions();
+                        break;
+                    case "9":
+                        bankService.getCurrencyExchangeService().printAllCourses();
                         break;
                     default:
                         return;

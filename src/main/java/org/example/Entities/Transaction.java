@@ -25,7 +25,7 @@ public class Transaction {
     private DtCt dtCt;
 
     @Column(nullable = false)
-    private BigDecimal amount;
+    private double amount;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date", nullable = false)
@@ -34,7 +34,7 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(Account account, DtCt dtCt, BigDecimal amount, Date date) {
+    public Transaction(Account account, DtCt dtCt, double amount, Date date) {
         this.account = account;
         this.dtCt = dtCt;
         this.amount = amount;
